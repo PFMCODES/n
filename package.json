@@ -1,0 +1,25 @@
+{
+  "name": "nium",
+  "version": "1.0.5",
+  "description": "nium is a nodejs manager which compiles and does all the heavy work for you",
+  "main": "src/index.js",
+  "bin": {
+    "nium": "src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pfm37/n.git"
+  },
+  "keywords": [
+    "work",
+    "heavy",
+    "work",
+    "n"
+  ],
+  "author": "PFMCODES",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pfm37/n/issues"
+  },
+  "homepage": "https://github.com/pfm37/n#readme"
+}
