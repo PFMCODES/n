@@ -1,16 +1,21 @@
-<img src="./n.svg" alt="n logo" style="width: 50px;">
+# ⚡ Nium CLI (`n`)
 
-<h1 style="font-size: 35px;">Install n</h1>
+> A lightweight, blazing-fast CLI tool for initializing, managing, and building JavaScript/TypeScript projects with ease.
+
+---
+
+## ✨ Features
+
+- 📦 Easy project scaffolding with `n init`
+- ⚙️ Auto-generates `package.json`, `.gitignore`, and more
+- 🧠 Smart global settings with `n settings`
+- 🚀 Instant builds with `n build`
+- 🔁 Run custom scripts via `n run`
+- 🧪 Benchmark performance using `n speed-test`
+
+---
+
+## 📥 Installation
 
 ```bash
-npm i nium -g
-```
-
-<h1>What n does</h1>
-
-<h3>n is a program made in javascript which increases effieciency<br>
-it comes with commands like:
-init,
-build,
-run and more...
-</h3>
+npm install -g nium
