@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { fs } = require('./exports');
+const { fs, exec } = require('./exports');
 const { init } = require("./c/init");
-// const run = require('./c/run');
+const { run } = require('./c/run');
 const { build } = require('./c/build');
 const { filePath, folderPath, ensureConfigExists } = require('./global-config');
 
@@ -10,16 +10,27 @@ async function main() {
   const [, , command, ...args] = process.argv;
 
   switch (command) {
+    case ".": 
+    await exec('npm install', (err, stdout, stderr) => {
+      if (err) {
+        throw err;
+      } else {
+        console.log(stdout);
+      }
+    });
+    await build();
+    break
     case '--help':
       console.log(`Available commands:
     build
+    run
     init
     settings`);
       break;
 
-    // case 'run':
-    //   run(args);
-    //   break;
+    case 'run':
+       run(args);
+       break;
 
     case 'build':
       await ensureConfigExists();

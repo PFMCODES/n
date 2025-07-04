@@ -5,7 +5,16 @@ function build(args) {
   if(fs.existsSync(path.join(process.cwd(), 'n.config.json'))) {
     if (nconfig.build) {
       console.log(`> ${nconfig.build}`)
-      exec(nconfig.build)
+      exec(nconfig.build, (err, stdout, stderr) => {
+        if (err) {
+          console.error("Execution error:", err);
+          process.exit(1);
+        } else {
+          console.log(stdout);
+          if (stderr) console.error(stderr);
+          process.exit(1);
+        }
+      });
     }
     else {
       if (fs.existSync(path.join(process.cwd(), 'package.json'))) {
