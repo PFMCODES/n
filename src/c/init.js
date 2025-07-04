@@ -37,7 +37,13 @@ function init(args = []) {
       }
     });
   } else {
-    rl.question('Do you want to reinitialize the project? ', (answer) => {
+    inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'confirmInit',
+      message: 'Do you want to initialize the project?',
+      default: true
+    }]).then((answer) => {
       if (answer === 'y') {
         reinit = true;
         if (args.includes('-y')) {

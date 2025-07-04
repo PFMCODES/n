@@ -2,7 +2,9 @@
 
 const { fs, exec } = require('./exports');
 const { init } = require("./c/init");
+const { update } = require('./c/update');
 const { run } = require('./c/run');
+const { speedTest } = require('./c/speed-test');
 const { build } = require('./c/build');
 const { filePath, folderPath, ensureConfigExists } = require('./global-config');
 
@@ -20,6 +22,9 @@ async function main() {
     });
     await build();
     break
+    case 'speed-test':
+      await speedTest();
+      break;
     case '--help':
       console.log(`Available commands:
     build
@@ -57,9 +62,18 @@ async function main() {
         console.error("Error reading settings:", err.message);
         break;
       }
+    case 'update':
+      update(args)
+      break;
     case 'init':
       await ensureConfigExists();
       init(args);
+      break;
+
+    case 'version':
+    case '-v':
+    case '--version':
+      console.log("2.1.4");
       break;
 
     default:

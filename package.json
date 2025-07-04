@@ -1,6 +1,6 @@
 {
   "name": "nium",
-  "version": "1.0.5",
+  "version": "2.1.6",
   "description": "nium is a nodejs manager which compiles and does all the heavy work for you",
   "main": "src/index.js",
   "bin": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/pfm37/n#readme",
   "dependencies": {
+    "chalk": "^5.4.1",
     "child_process": "^1.0.2",
     "inquirer": "^12.7.0",
     "ora": "^8.2.0",
