@@ -1,12 +1,10 @@
-const { exec, path, fs, readline, nconfig } = require('./exports');
+const { exec, path, fs, readline, nconfig } = require('../exports');
 const { init } = require('./init');
-const { incrementBuildCount } = require('./user-data');
 
 function build(args) {
   if(fs.existsSync(path.join(process.cwd(), 'n.config.json'))) {
     if (nconfig.build) {
       console.log(`> ${nconfig.build}`)
-      incrementBuildCount();
       exec(nconfig.build)
     }
     else {

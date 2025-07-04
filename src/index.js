@@ -1,52 +1,59 @@
 #!/usr/bin/env node
-const [, , command, ...args] = process.argv;
-switch (command) {
-  case '--help':
-    console.log(`Available commands:
-                  run
-                  build
-                  user
-                  projects
-                  stats\n`)
-    break;
-  case 'run':
-    const run = require('./c/run');
-    run(args);
-    break;
-  case 'build':
-    const { build } = require('./c/build')
-    build(args);
-    break;
-  case 'user':
-    const { getUserData, setUserData } = require('./c/user-data');
-    if (args[0] === 'set' && args[1] && args[2]) {
-      setUserData(args[1], args[2]);
-      console.log(`Set ${args[1]} to ${args[2]}`);
-    } else if (args[0] === 'get' && args[1]) {
-      const userData = getUserData();
-      console.log(JSON.stringify(userData, null, 2));
-    } else {
-      console.log('Usage: user set <key> <value> | user get');
-    }
-    break;
-  case 'projects':
-    const { getUserProjects } = require('./c/user-data');
-    const projects = getUserProjects();
-    console.log('Your projects:');
-    projects.forEach(project => {
-      console.log(`- ${project.name} (${project.type}) at ${project.path}`);
-    });
-    break;
-  case 'stats':
-    const { getUserStats } = require('./c/user-data');
-    const stats = getUserStats();
-    console.log('Your stats:');
-    console.log(`Projects created: ${stats.projectsCreated}`);
-    console.log(`Builds run: ${stats.buildsRun}`);
-    console.log(`Last activity: ${stats.lastActivity || 'Never'}`);
-    break;
-  case 'init': 
-    const { init } = require("./c/init")
-    init(args)
+
+const { fs } = require('./exports');
+const { init } = require("./c/init");
+// const run = require('./c/run');
+const { build } = require('./c/build');
+const { filePath, folderPath, ensureConfigExists } = require('./global-config');
+
+async function main() {
+  const [, , command, ...args] = process.argv;
+
+  switch (command) {
+    case '--help':
+      console.log(`Available commands:
+    build
+    init
+    settings`);
       break;
+
+    // case 'run':
+    //   run(args);
+    //   break;
+
+    case 'build':
+      await ensureConfigExists();
+      build(args);
+      break;
+
+    case 'settings':
+      await ensureConfigExists();
+
+      if (!fs.existsSync(filePath)) {
+        console.error("Config file not found.");
+        return;
+      }
+
+      try {
+        const result = fs.readFileSync(filePath, 'utf-8');
+        const settings = JSON.parse(result);
+        console.log('Settings');
+        console.log(`    Name: ${settings.name}`);
+        console.log(`    Project Type: ${settings.projectType}`);
+        console.log(`    Language: ${settings.language}`);
+        break;
+      } catch (err) {
+        console.error("Error reading settings:", err.message);
+        break;
+      }
+    case 'init':
+      await ensureConfigExists();
+      init(args);
+      break;
+
+    default:
+      console.log(`Unknown command "${command}". Use --help to see available commands.`);
+  }
 }
+
+main(); // <- run the async main function

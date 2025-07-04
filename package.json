@@ -18,8 +18,17 @@
   ],
   "author": "PFMCODES",
   "license": "MIT",
+  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/pfm37/n/issues"
   },
-  "homepage": "https://github.com/pfm37/n#readme"
+  "homepage": "https://github.com/pfm37/n#readme",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "inquirer": "^12.7.0",
+    "ora": "^8.2.0",
+    "os": "^0.1.2",
+    "path": "^0.12.7",
+    "readline": "^1.3.0"
+  }
 }
