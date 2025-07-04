@@ -1,135 +1,114 @@
-
 const { exec, path, fs, readline } = require('../exports');
 const { default: inquirer } = require('inquirer');
 const { getUserData } = require('../user-data');
-let startCommand = () => {
-  if (language === 'JavaScript') {
-    return 'node index.js';
-  } else if (language === 'TypeScript') {
-    return 'ts-node index.ts';
-  } else {
-    return 'node index.js';
-  }
-};
 
-let reinit = false;
-
-const rl = readline.createInterface({
+let rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+function startCommand(language) {
+  return language === 'TypeScript' ? 'ts-node index.ts' : 'node index.js';
+}
+
+function langExt(language) {
+  return language === 'TypeScript' ? 'ts' : 'js';
+}
+
 function init(args = []) {
-  if (!fs.existsSync(path.join(process.cwd(), 'n.config.json'))) {
-    if (answer === 'y') {
-      reinit = false;
-      if (args.includes('-y')) {
-        initMain(1);
-      } else {
-        initMain(0);
-      }
-    } else if (answer === 'n') {
-      rl.close();
-      return;
-    };
+  const configPath = path.join(process.cwd(), 'n.config.json');
+
+  const proceed = (reinit) => {
+    if (args.includes('-y')) {
+      initMain(1, reinit);
+    } else {
+      initMain(0, reinit);
+    }
+  };
+
+  if (!fs.existsSync(configPath)) {
+    rl.question('Do you want to initialize the project? (y/n): ', (answer) => {
+      if (answer.toLowerCase() === 'y') proceed(false);
+      else rl.close();
+    });
   } else {
     rl.question('Do you want to reinitialize the project? (y/n): ', (answer) => {
-      if (answer === 'y') {
-        reinit = true;
-        if (args.includes('-y')) {
-          initMain(1);
-        } else {
-          initMain(0);
-        }
-      } else {
-        rl.close();
-        return;
-      }
+      if (answer.toLowerCase() === 'y') proceed(true);
+      else rl.close();
     });
   }
 }
 
-function initMain(a) {
-  if (a == 1) {
-    
+function initMain(autoMode = 0, reinit = false) {
+  const user = getUserData() || { name: 'Anonymous', language: 'JavaScript', projectType: 'NodeJs' };
+  const extension = langExt(user.language);
+  const projectName = path.basename(process.cwd());
 
-    console.log(`Project ${projectName} initialized successfully with defaults!`);
-  } else if (a == 0) {
-    rl.question('Are you initializing a new project? (y/n): ', (a1) => {
-      if (a1 === 'y') {
-        rl.question('Do you want to make a new folder for it? (y/n): ', (a2) => {
-          if (a2 === 'y') {
-            rl.question('Enter the project name: ', (a3) => {
-              rl.close();
-              inquirer.prompt([
-                {
-                  type: 'list',
-                  name: 'projectType',
-                  message: 'What type of project are you creating?',
-                  choices: [
-                    'NodeJs',
-                    'React', 
-                    'Vue',
-                    'NextJs',
-                    'React Native',
-                    'NPM Module'
-                  ]
-                }
-              ]).then((a4) => {
-                  createProject(a3, a4.projectType, a2, reinit, "JavaScript")
-              });
-            });
-          } else {
-            
-          }
-        });
-      } else {
-        rl.close();
-      }
-    });
-  }
+  // Create files
+  fs.writeFileSync(`index.${extension}`, 'console.log("Hello, World!");');
+  fs.writeFileSync('package.json', JSON.stringify({
+    name: projectName,
+    version: '1.0.0',
+    description: '',
+    main: `index.${extension}`,
+    scripts: {
+      start: startCommand(user.language),
+    },
+    author: user.name,
+    license: 'ISC',
+    dependencies: {},
+    devDependencies: {}
+  }, null, 2));
+  fs.writeFileSync('README.md', `# ${projectName}\n\nThis is a Node.js project created with Nium.`);
+  fs.writeFileSync('.gitignore', 'node_modules/\n.DS_Store\n.env\n');
+  fs.writeFileSync('n.config.json', JSON.stringify({
+    name: projectName,
+    projectType: user.projectType,
+    version: '1.0.0',
+    build: '',
+    scripts: {
+      start: startCommand(user.language),
+    },
+    author: user.name
+  }, null, 2));
+
+  rl.close();
 }
 
-function createProject(projectName, projectType, makeNewFolder, reinit, language) {
-  if (projectType === 'NodeJs') {
-    nodejs();
+function createProject(projectName, projectType, makeNewFolder, language) {
+  if (makeNewFolder === 'y' && !fs.existsSync(projectName)) {
+    fs.mkdirSync(projectName);
+    process.chdir(projectName);
   }
-    
-  function nodejs() {
-    if (makeNewFolder === 'y') {
-      if (!fs.existsSync(projectName)) {
-        fs.mkdirSync(projectName);
-      }
-      process.chdir(projectName);
-      const lang = () => { if (language === 'JavsScript') { return 'js' } else if (language === 'TypeScript') { return 'ts' } else { return 'js' } };
-      fs.writeFileSync(`index.${lang}`)
-      fs.writeFileSync('package.json', JSON.stringify({
-        name: projectName,
-        version: '1.0.0',
-        description: '',
-        main: `index.${lang()}`,
-        scripts: {
-          start: startCommand(),
-        },
-        author: getUserData().name,
-        license: 'ISC',
-        dependencies: {},
-        devDependencies: {}
-      }, null, 2))
-      fs.writeFileSync('README.md', `# ${projectName}\n\nThis is a Node.js project created with Nium.`);
-      fs.writeFileSync('.gitignore', 'node_modules/\n.DS_Store\n.env\n');
-      fs.writeFileSync('n.config.json', JSON.stringigfy({
-        name: projectName,
-        projectType: projectType,
-        build: '',
-        scripts: {
-          start: startCommand(),
-        },
-        author: getUserData().name,
-        version: '1.0.0',
-      }, null, 2))
-    }
-  }
+
+  const extension = langExt(language);
+
+  fs.writeFileSync(`index.${extension}`, '');
+  fs.writeFileSync('package.json', JSON.stringify({
+    name: projectName,
+    version: '1.0.0',
+    description: '',
+    main: `index.${extension}`,
+    scripts: {
+      start: startCommand(language),
+    },
+    author: getUserData()?.name || 'Anonymous',
+    license: 'ISC',
+    dependencies: {},
+    devDependencies: {}
+  }, null, 2));
+  fs.writeFileSync('README.md', `# ${projectName}\n\nThis is a Node.js project created with Nium.`);
+  fs.writeFileSync('.gitignore', 'node_modules/\n.DS_Store\n.env\n');
+  fs.writeFileSync('n.config.json', JSON.stringify({
+    name: projectName,
+    projectType: projectType,
+    version: '1.0.0',
+    build: '',
+    scripts: {
+      start: startCommand(language),
+    },
+    author: getUserData()?.name || 'Anonymous'
+  }, null, 2));
 }
 
 module.exports = { init, initMain, createProject };
