@@ -12,7 +12,7 @@ async function ensureConfigExists() {
       {
         type: 'confirm',
         name: 'confirm',
-        message: 'Oops! It seems like you are running n(Nium) for the first time. Do you want to create a new config file?',
+        message: 'Oops! It seems like you are running n(Nium) for the first time. Do you want to set some basic settings file?',
         default: true,
       },
     ]);

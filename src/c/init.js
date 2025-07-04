@@ -103,6 +103,21 @@ function createProject(projectName, projectType, makeNewFolder, reinit, language
       process.chdir(projectName);
       const lang = () => { if (language === 'JavsScript') { return 'js' } else if (language === 'TypeScript') { return 'ts' } else { return 'js' } };
       fs.writeFileSync(`index.${lang}`)
+      fs.writeFileSync('package.json', JSON.stringify({
+        name: projectName,
+        version: '1.0.0',
+        description: '',
+        main: `index.${lang()}`,
+        scripts: {
+          start: startCommand(),
+        },
+        author: getUserData().name,
+        license: 'ISC',
+        dependencies: {},
+        devDependencies: {}
+      }, null, 2))
+      fs.writeFileSync('README.md', `# ${projectName}\n\nThis is a Node.js project created with Nium.`);
+      fs.writeFileSync('.gitignore', 'node_modules/\n.DS_Store\n.env\n');
       fs.writeFileSync('n.config.json', JSON.stringigfy({
         name: projectName,
         projectType: projectType,
